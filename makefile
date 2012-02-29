@@ -173,6 +173,8 @@ docs:
 	@$(ECHO) "Generating Documentation:"
 	$(if $(VERBOSE:1=),@)-$(DOXYGEN) docs/doxyfile
 	$(if $(VERBOSE:1=),@)-$(MAKE) -C docs/latex
+	@mv docs/latex/refman.pdf ./
+
 .PHONY : clean
 clean:
 	@$(ECHO) "Cleaning:"
@@ -183,6 +185,7 @@ distclean:
 	@$(ECHO) "Dist cleaning:"
 	$(if $(VERBOSE:1=),@)-$(RM) -$(if $(VERBOSE:1=),,v)f $(CLEANUPFILES)
 	$(if $(VERBOSE:1=),@)-$(RM) -r$(if $(VERBOSE:1=),,v)f $(DOCS)
+	$(if $(VERBOSE:1=),@)-$(RM) -$(if $(VERBOSE:1=),,v)f refman.pdf
 ifndef WINDOWS
 	$(if $(VERBOSE:1=),@)find $(srctree) $(RCS_FIND_IGNORE) \
 		\( -name '*.orig' -o -name '*.rej' -o -name '*~' \
