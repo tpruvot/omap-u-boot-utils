@@ -304,6 +304,7 @@ int send_file(struct usb_device *dev, char *f_name)
 	int ret = 0;
 	unsigned long cur_size = 0;
 	unsigned int filesize;
+	unsigned int asic_id;
 	char asic_buffer[ASICID_SIZE_OMAP4];
 	char read_buffer[READ_BUFFER_SIZE];
 	int fail = 0;
@@ -339,7 +340,6 @@ int send_file(struct usb_device *dev, char *f_name)
 
 	/* read ASIC ID */
 	memset(asic_buffer, 0, ASICID_SIZE_OMAP4);
-
 	ret = usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
 			  ASIC_ID_TIMEOUT);
 	/* if no ASIC ID, request it explicitly */
@@ -365,19 +365,41 @@ int send_file(struct usb_device *dev, char *f_name)
 		int i = 0;
 		printf("ASIC ID:\n");
 		while (i < asicid_size) {
-			printf("%d: 0x%x[%c]\n", i, asic_buffer[i] & 0xff,
+			printf("%d: 0x%02x[%c]\n", i, asic_buffer[i] & 0xff,
 			       asic_buffer[i] > 0x10 ? asic_buffer[i] : '?');
 			i++;
 		}
 	}
+
+	asic_id = (asic_buffer[4] << 8) + asic_buffer[5];
+	switch (asic_id) {
+	case 0x0000:
+		// nothing read
+		break;
+	case 0x3430:
+	case 0x3630:
+		printf("ASIC ID Detected: OMAP %04x with ROM Version "
+		       "0x%02x%02x\n", asic_id, asic_buffer[6], asic_buffer[7]);
+		break;
+	case 0x4430:
+	case 0x4460:
+		printf("ASIC ID Detected: OMAP %04x with ROM Version "
+		       "0x%02x%02x\n", asic_id, asic_buffer[6], asic_buffer[7]);
+		break;
+	default:
+		printf("ASIC ID Detected: 0x%02x%02x 0x%02x 0x%02x\n",
+		       asic_buffer[4], asic_buffer[5],
+		       asic_buffer[6], asic_buffer[7]);
+		break;
+	}
+
 	/* Send the  Continue Peripheral boot command */
 	if (send_command(udev, DOWNLOAD_COMMAND)) {
 		fail = -1;
 		goto closeup;
 	}
 	/* Send in the filesize */
-	ret =
-	    usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, (char *)&filesize,
+	ret = usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, (char *)&filesize,
 			   sizeof(filesize), ASIC_ID_TIMEOUT);
 	if (ret != sizeof(filesize)) {
 		APP_ERROR
@@ -389,8 +411,7 @@ int send_file(struct usb_device *dev, char *f_name)
 	}
 	/* pump in the data */
 	while (filesize) {
-		int r_size = f_read((unsigned char *)read_buffer,
-				    sizeof(read_buffer));
+		int r_size = f_read((unsigned char *)read_buffer, sizeof(read_buffer));
 		ret =
 		    usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, read_buffer,
 				   r_size, ASIC_ID_TIMEOUT);
