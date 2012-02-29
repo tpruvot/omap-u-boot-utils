@@ -338,8 +338,9 @@ int send_file(struct usb_device *dev, char *f_name)
 	}
 
 	/* read ASIC ID */
-	ret =
-	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
+	memset(asic_buffer, 0, ASICID_SIZE_OMAP4);
+
+	ret = usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
 			  ASIC_ID_TIMEOUT);
 	/* if no ASIC ID, request it explicitly */
 	if (ret != asicid_size && send_command(udev, GET_ASICID_COMMAND)) {
@@ -348,22 +349,24 @@ int send_file(struct usb_device *dev, char *f_name)
 		goto closeup;
 	}
 
-	/* now try again */
-	ret =
-	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
-			  ASIC_ID_TIMEOUT);
+	/* now try again, (only if last result was bad) */
 	if (ret != asicid_size) {
-		APP_ERROR("Expected to read %d, read %d - err str: %s\n",
-			  asicid_size, ret, strerror(errno));
-		fail = -1;
-		goto closeup;
+		ret = usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer,
+				asicid_size, ASIC_ID_TIMEOUT);
+		if (ret != asicid_size) {
+			APP_ERROR("Expected to read %d, read %d - err str: %s\n",
+				  asicid_size, ret, strerror(errno));
+			fail = -1;
+			goto closeup;
+		}
 	}
+
 	if (verbose > 0) {
 		int i = 0;
 		printf("ASIC ID:\n");
 		while (i < asicid_size) {
-			printf("%d: 0x%x[%c]\n", i, asic_buffer[i],
-			       asic_buffer[i]);
+			printf("%d: 0x%x[%c]\n", i, asic_buffer[i] & 0xff,
+			       asic_buffer[i] > 0x10 ? asic_buffer[i] : '?');
 			i++;
 		}
 	}
