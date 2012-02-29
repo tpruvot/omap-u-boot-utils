@@ -13,7 +13,7 @@ Where:
 @li -v          : (optional) verbose messages
 @li -V          : (optional) verbose messages + usblib debug messages
 @li -q          : (optional) Ultra quiet - no outputs other than error
-@li -d device_ID: (optional) USB Device id (Uses default of 0xD009)
+@li -d device_ID: (optional) USB Device id (Uses default of 0xD00E)
 @li -f input_file: input file to be transmitted to target
 
 @warning Use sudo to get access to set_configuration

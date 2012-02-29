@@ -49,6 +49,8 @@ A) Get the Environment:
 Based on which ever distribution you have, you would need gcc, make,
 binutils, libc
 
+pusb requires libusb-dev package on debian/ubuntu systems, built with "make usb"
+
 You could run "apt-get install gcc" or "yum install gcc" based on debian or
 redhat distribution
 
@@ -211,7 +213,7 @@ Where:
    -v          : (optional) verbose messages
    -V          : (optional) verbose messages + usblib debug messages
    -q          : (optional) Ultra quiet - no outputs other than error
-   -d device_ID: (optional) USB Device id (Uses default of 0xD009)
+   -d device_ID: (optional) USB Device id (Uses default of 0xD00E)
    -f input_file: input file to be transmitted to target
 NOTE: it is required to run this program in sudo mode to get access at times
 

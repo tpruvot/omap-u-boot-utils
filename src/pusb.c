@@ -50,8 +50,9 @@
 
 /* Texas Instruments */
 #define SEARCH_VENDOR_DEFAULT	0x0451
-/* OMAP3430 */
-#define SEARCH_PRODUCT_DEFAULT	0xD009
+#define DEVICE_ID_3430			0xD009
+#define DEVICE_ID_3630			0xD00E
+#define SEARCH_PRODUCT_DEFAULT	(DEVICE_ID_3630)
 /* bConfigurationValue: 1 */
 #define CONFIG_INDEX_DEFAULT	0x1
 /* bInterfaceNumber: 0 */
@@ -62,9 +63,10 @@
 #define ASICID_SIZE_OMAP4		81	/* 1+7+4+23+35+11 */
 #define ASIC_ID_TIMEOUT			100
 #define COMMAND_SIZE			4
-#define GET_ASICID_COMMAND		0xF0030003
 #define DOWNLOAD_COMMAND		0xF0030002
-#define MAX_SIZE				(64 * 1024)
+#define GET_ASICID_COMMAND		0xF0030003 /* OMAP4 only */
+//#define MAX_SIZE				(64 * 1024)
+#define MAX_SIZE				(512 * 1024)
 #define READ_BUFFER_SIZE		4096
 
 /* Print control */
