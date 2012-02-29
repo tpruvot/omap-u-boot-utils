@@ -39,9 +39,10 @@
 #include "f_status.h"
 
 #define ASIC_ID_SIZE	7
-#define ASIC_ID_OMAP4430 0x4430
 #define ASIC_ID_OMAP3430 0x3430
 #define ASIC_ID_OMAP3630 0x3630
+#define ASIC_ID_OMAP4430 0x4430
+#define ASIC_ID_OMAP4460 0x4460
 
 #define MAX_BUF		2048
 #define TOT_SIZE	MAX_BUF
@@ -249,19 +250,20 @@ int main(int argc, char **argv)
 	}
 	asic_id = (buff[3] << 8) + buff[4];
 	switch (asic_id) {
-	case ASIC_ID_OMAP4430:
-		printf("ASIC ID Detected: OMAP 4430 with ROM Version"
-			" 0x%02x%02x\n", buff[5], buff[6]);
-		read_size = 59;
-		break;
 	case ASIC_ID_OMAP3430:
 	case ASIC_ID_OMAP3630:
 		printf("ASIC ID Detected: OMAP %04x with ROM Version"
 			" 0x%02x%02x\n", asic_id, buff[5], buff[6]);
 		read_size = 50;
 		break;
+	case ASIC_ID_OMAP4430:
+	case ASIC_ID_OMAP4460:
+		printf("ASIC ID Detected: OMAP %04x with ROM Version"
+			" 0x%02x%02x\n", asic_id, buff[5], buff[6]);
+		read_size = 59;
+		break;
 	default:
-		printf("ASIC ID Detected: 0x%02x 0x%02x 0x%02x 0x%02x\n",
+		printf("ASIC ID Detected: 0x%02x%02x 0x%02x 0x%02x\n",
 			buff[3], buff[4], buff[5], buff[6]);
 		read_size = 50;
 		break;
